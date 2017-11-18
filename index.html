@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Hello World!</title>
+		<script src="phaser.js"></script>
+	</head>
+
+	<body>
+		<hl>My Game!</hl>
+		<script type="text/javascript">
+		var game = new Phaser.Game(800, 600, Phaser.AUTO, '',
+			{ preload: preload, create: create, update: update});
+
+		function preload()
+		{
+			game.load.image('background', 'assets/sky.png');
+			game.load.image('player', 'assets/person.png');
+			game.load.image('collectable', 'assets/corn.png');
+
+
+		} // preload
+		var player;
+		var controls;
+
+		var collectables;
+		var score;
+		var scoreText;
+
+		function create()
+		{
+			game.physics.startSystem(Phaser.Physics.ARCADE);
+			//add background
+			game.add.sprite(0, 0, 'background');
+
+			//add player
+			player = game.add.sprite(360, 260, 'player');
+			game.physics.arcade.enable(player);
+
+			//add controls
+			controls = game.input.keyboard.createCursorKeys();
+
+			// add collectables
+			collectables = game.add.group();
+			collectables.enableBody = true; 
+			for(var i = 0; i < 10; ++i)
+			{
+				collectables.create(game.rnd.integerInRange(0, 700),
+									game.rnd.integerInRange(0, 500), 'collectable');
+			}
+
+			// adds = score
+			score = 0;
+			scoreText = game.add.text(16,16, 'Score: 0', {fontSize:'32px', fill: '#000'});
+		} // create
+
+		function update()
+		{
+				player.body.velocity.x = 0;
+				if(controls.left.isDown)  { player.body.velocity.x = -200 };
+				if(controls.right.isDown) { player.body.velocity.x = 200 };
+
+				player.body.velocity.y = 0;
+				if(controls.down.isDown) { player.body.velocity.y = 200};
+				if(controls.up.isDown) { player.body.velocity.y = -200};
+
+				game.physics.arcade.overlap(player, collectables, collect, null, this);
+		} // update
+
+		function collect(player, item)
+		{
+			item.kill();
+			score += 10;
+			scoreText.text = "Score: " + score;
+		}
+
+		</script>
+	</body>
+
+
+</html>
